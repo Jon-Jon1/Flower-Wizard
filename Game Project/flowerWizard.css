@@ -1,3 +1,16 @@
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	margin: 0;
+    background-color: rgb(19, 23, 27);
+}
+
 #gameCanvas{
-	background-color: black;
+	background-image: url('Sprites/mountain_final.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+    position: absolute;
+    cursor: url('Sprites/cursor3.png'), auto;
 }
