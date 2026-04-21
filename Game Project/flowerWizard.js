@@ -2,6 +2,17 @@ const mainDisplay = document.getElementById("gameCanvas");
 const gameSize = gameCanvas.getBoundingClientRect();
 const gameCtx = gameCanvas.getContext("2d");
 
+// ── Start screen fade ──
+let gameStarted = false;
+const startScreen = document.getElementById("StartScreen");
+const startBtn = document.getElementById("start-btn");
+
+startBtn.addEventListener("click", () => {
+    startScreen.classList.add("fade-out");
+    gameStarted = true;
+});
+
+
 let player = {
     health: 100,
     x: 100,
@@ -145,9 +156,7 @@ let lastOrbAngle = 0;
 function getOrbPosition() {
     let playerCenterX = player.x + 127;
     let playerCenterY = player.y + 127;
-    if (mouse.down) {
         lastOrbAngle = Math.atan2(mouse.y - playerCenterY, mouse.x - playerCenterX);
-    }
     return {
         x: playerCenterX + Math.cos(lastOrbAngle) * orb.radius,
         y: playerCenterY + Math.sin(lastOrbAngle) * orb.radius,
@@ -156,6 +165,20 @@ function getOrbPosition() {
 
 function drawGame() {
     gameCtx.clearRect(-5, -5, gameCanvas.width + 10, gameCanvas.height + 10);
+	//Draw drips
+    for (let i = drips.length - 1; i >= 0; i--) {
+        if (dripSheet.complete && dripSheet.naturalHeight !== 0) {
+            let numFrames = dripSheet.width / dripSheet.height; // assumes square frames
+            let frameW = dripSheet.height;
+            drips[i].frameCounter++;
+            drips[i].frame = Math.floor(drips[i].frameCounter / 5); // slower animation
+            gameCtx.drawImage(dripSheet, drips[i].frame * frameW, 0, frameW, frameW,
+                drips[i].x - frameW / 2, drips[i].y - 100, frameW, frameW);
+            if (drips[i].frame >= numFrames) {
+                drips.splice(i, 1); // delete once animation is done
+            }
+        }
+    }
     let playerImg = flowerImg;
     let sheet = null;
     if (player.direction === "right" && rightSheet.complete && rightSheet.naturalHeight !== 0) {
@@ -187,20 +210,7 @@ function drawGame() {
     }
 
 
-    //Draw drips
-    for (let i = drips.length - 1; i >= 0; i--) {
-        if (dripSheet.complete && dripSheet.naturalHeight !== 0) {
-            let numFrames = dripSheet.width / dripSheet.height; // assumes square frames
-            let frameW = dripSheet.height;
-            drips[i].frameCounter++;
-            drips[i].frame = Math.floor(drips[i].frameCounter / 5); // slower animation
-            gameCtx.drawImage(dripSheet, drips[i].frame * frameW, 0, frameW, frameW,
-                drips[i].x - frameW / 2, drips[i].y - 100, frameW, frameW);
-            if (drips[i].frame >= numFrames) {
-                drips.splice(i, 1); // delete once animation is done
-            }
-        }
-    }
+    
 
 
 
@@ -234,8 +244,6 @@ function drawGame() {
         gameCtx.fill();
     }
 
-    // Draw projectiles
-   
 
     // Draw dash cooldown bar (only show while on cooldown)
     if (player.dashCooldown > 0) {
@@ -337,6 +345,7 @@ function playerMovement() {
             player.direction = "right";
         }
     }
+    if (!gameStarted) { requestAnimationFrame(playerMovement); return; }
     col("player", "wall");
     drawGame();
     requestAnimationFrame(playerMovement);
@@ -359,6 +368,7 @@ function movementAnimation() {
 }
 
 function moveProjectiles() {
+    if (!gameStarted) { requestAnimationFrame(moveProjectiles); return; }
     for (let i = 0; i < playerProjectiles.length; i++) {
         playerProjectiles[i].x +=
             Math.cos(playerProjectiles[i].angle) * playerProjectiles[i].speed;
@@ -371,6 +381,7 @@ function moveProjectiles() {
 }
 
 function spawnDrip() {
+    if (!gameStarted) { requestAnimationFrame(spawnDrip); return; }
     if (Math.random() < 1 / 250) {
         let { x: orbX, y: orbY } = getOrbPosition();
         drips.push({
@@ -382,6 +393,7 @@ function spawnDrip() {
 }
 
 function createProjectile() {
+    if (!gameStarted) { requestAnimationFrame(createProjectile); return; }
     if (player.lastshot <= 0) {
         if (mouse.down) {
             let { x: orbCenterX, y: orbCenterY } = getOrbPosition();
