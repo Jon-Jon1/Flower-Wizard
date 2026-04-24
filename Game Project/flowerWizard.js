@@ -2,7 +2,7 @@ const mainDisplay = document.getElementById("gameCanvas");
 const gameSize = gameCanvas.getBoundingClientRect();
 const gameCtx = gameCanvas.getContext("2d");
 
-// ── Start screen fade ──
+
 let gameStarted = false;
 const startScreen = document.getElementById("StartScreen");
 const startBtn = document.getElementById("start-btn");
@@ -39,14 +39,14 @@ let orb = {
     height: 50,
     animationFrame: 0,
     energy: 1.0,
-    radius: 100, // distance from player center
+    radius: 100, 
 };
 let enemies = [];
 let keys = [];
 let keyPressTime = {};
-const DOUBLE_PRESS_THRESHOLD = 250; // milliseconds
+const DOUBLE_PRESS_THRESHOLD = 250; 
 
-//direction arrays
+
 let left = [];
 let up = [];
 let down = [];
@@ -57,6 +57,7 @@ let downLeft = [];
 let drips = [];
 
 document.addEventListener("keydown", (e) => {
+	if(gameStarted){
     const key = e.key.toLowerCase();
     const cardinalKeys = ["w", "a", "s", "d"];
 
@@ -73,6 +74,7 @@ document.addEventListener("keydown", (e) => {
     }
 
     keys[key] = true;
+}
 });
 document.addEventListener("keyup", (e) => {
     keys[e.key.toLowerCase()] = false;
@@ -168,14 +170,14 @@ function drawGame() {
 	//Draw drips
     for (let i = drips.length - 1; i >= 0; i--) {
         if (dripSheet.complete && dripSheet.naturalHeight !== 0) {
-            let numFrames = dripSheet.width / dripSheet.height; // assumes square frames
+            let numFrames = dripSheet.width / dripSheet.height;
             let frameW = dripSheet.height;
             drips[i].frameCounter++;
             drips[i].frame = Math.floor(drips[i].frameCounter / 5); // slower animation
             gameCtx.drawImage(dripSheet, drips[i].frame * frameW, 0, frameW, frameW,
                 drips[i].x - frameW / 2, drips[i].y - 100, frameW, frameW);
             if (drips[i].frame >= numFrames) {
-                drips.splice(i, 1); // delete once animation is done
+                drips.splice(i, 1);
             }
         }
     }
@@ -220,8 +222,8 @@ function drawGame() {
     let { x: orbX, y: orbY } = getOrbPosition();
 
      for (let i = 0; i < playerProjectiles.length; i++) {
-        gameCtx.fillStyle = "#ADD8E6"; // light blue for bubble
-        gameCtx.strokeStyle = "#00008B"; // dark blue outline
+        gameCtx.fillStyle = "#ADD8E6"; 
+        gameCtx.strokeStyle = "#00008B"; 
         gameCtx.lineWidth = 1;
         gameCtx.beginPath();
         gameCtx.arc(playerProjectiles[i].x + 1.5, playerProjectiles[i].y + 3, 5, 0, Math.PI * 2);
@@ -237,7 +239,9 @@ function drawGame() {
         gameCtx.drawImage(orbSheet, frame * orbFrameWidth, 0, orbFrameWidth, orbFrameHeight,
             orbX - orbFrameWidth / 2, orbY - orbFrameHeight / 2, orbFrameWidth, orbFrameHeight);
     } else {
-        // Fallback circle only when sheet isn't loaded
+
+
+        // Fallback circle 
         gameCtx.fillStyle = "#FF0000";
         gameCtx.beginPath();
         gameCtx.arc(orbX, orbY, orb.width / 2, 0, Math.PI * 2);
@@ -245,7 +249,7 @@ function drawGame() {
     }
 
 
-    // Draw dash cooldown bar (only show while on cooldown)
+    //  dash cooldown 
     if (player.dashCooldown > 0) {
         let barWidth = 200;
         let barHeight = 8;
@@ -387,7 +391,9 @@ function spawnDrip() {
         drips.push({
             x: orbX,
             y: orbY,
-            frame: 0,            frameCounter: 0,        });
+            frame: 0,
+			frameCounter: 0,
+		});
     }
     requestAnimationFrame(spawnDrip);
 }
